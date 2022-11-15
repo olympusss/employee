@@ -18,7 +18,7 @@ class Employee(Base):
     name            =   Column(String)
     surname         =   Column(String)
     job_title       =   Column(String)
-    employee_id     =   Column(Integer, ForeignKey("department.id"))
+    department_id     =   Column(Integer, ForeignKey("department.id"))
     create_At       =   Column(DateTime(timezone=False), default=datetime.now)
     update_At       =   Column(DateTime(timezone=False), default=datetime.now)
     employee_department =   relationship("Department", back_populates="department_employee")
