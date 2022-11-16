@@ -47,3 +47,9 @@ class Search(PostDefault):
 
     class Config:
         orm_mode = True
+
+class SearchUser(BaseModel):
+    text    :   str
+
+    class Config:
+        orm_mode = True
