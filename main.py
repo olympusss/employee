@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, lazyload, joinedload
 from sqlalchemy import func, and_
 from connection import Base, engine, get_db
 from models import User, Company, Department, Employee
@@ -34,17 +34,11 @@ async def get_company_department_list(req: PostDefault, db: Session = Depends(ge
     is_admin = db.query(User).filter(and_(User.name == req.name, User.admin == req.admin)).first()
     if not is_admin or is_admin.admin is False:
         return False
-    res = db.query(
-            Company.id,
-            Company.name,
+    res = db.query(Company)\
+        .options(
+            joinedload(Company.company_department)\
+                .options(joinedload(Department.department_employee))
         ).all()
-    new_list = []
-    for comp in res:
-        comp = dict(comp)
-        dep = db.query(Department.id, Department.name).filter(Department.company_id == comp['id']).all()
-        comp['department_list'] = list(dep)
-        new_list.append(comp)
-    res = new_list
     if res:
         return res
     else:
@@ -77,20 +71,7 @@ async def get_department_employee_list(req: PostDefault, db: Session = Depends(g
     is_admin = db.query(User).filter(and_(User.name == req.name, User.admin == req.admin)).first()
     if not is_admin or is_admin.admin is False:
         return False
-    res = db.query(
-        Department.id.label('department_id'),
-        Department.name.label('department_name'),
-        Company.id.label('company_id'),
-        Company.name.label('company_name')
-    ).join(Company, Company.id == Department.company_id).all()
-    new_list = []
-    for dep in res:
-        dep = dict(dep)
-        emp = db.query(Employee.id, Employee.name, Employee.surname, Employee.job_title)\
-            .filter(Employee.department_id == dep['department_id']).all()
-        dep['employee_list'] = list(emp)
-        new_list.append(dep)
-    res = new_list
+    res = db.query(Department).options(joinedload(Department.department_employee)).all()
     if res:
         return res
     else:

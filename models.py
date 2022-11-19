@@ -18,10 +18,9 @@ class Employee(Base):
     name            =   Column(String)
     surname         =   Column(String)
     job_title       =   Column(String)
-    department_id     =   Column(Integer, ForeignKey("department.id"))
+    department_id   =   Column(Integer, ForeignKey("department.id"))
     create_At       =   Column(DateTime(timezone=False), default=datetime.now)
     update_At       =   Column(DateTime(timezone=False), default=datetime.now)
-    employee_department =   relationship("Department", back_populates="department_employee")
 
 
 class Company(Base):
@@ -30,7 +29,7 @@ class Company(Base):
     name            =   Column(String)
     create_At       =   Column(DateTime(timezone=False), default=datetime.now)
     update_At       =   Column(DateTime(timezone=False), default=datetime.now)
-    company_department  = relationship("Department", back_populates="department_company")
+    company_department  = relationship("Department", lazy='joined')
 
 class Department(Base):
     __tablename__   =   "department" 
@@ -39,5 +38,4 @@ class Department(Base):
     company_id      =   Column(Integer, ForeignKey("company.id"))
     create_At       =   Column(DateTime(timezone=False), default=datetime.now)
     update_At       =   Column(DateTime(timezone=False), default=datetime.now)
-    department_employee = relationship("Employee", back_populates="employee_department")
-    department_company  = relationship("Company", back_populates="company_department")
+    department_employee = relationship("Employee", lazy='joined')

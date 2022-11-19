@@ -11,7 +11,7 @@ class UserSchema(BaseModel):
         
 
 class PostDefault(BaseModel):
-    name        : str
+    name        : str = 'kerim'
     admin       : bool
 
     class Config:
